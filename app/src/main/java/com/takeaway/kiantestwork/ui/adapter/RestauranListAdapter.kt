@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.takeaway.kiantestwork.R
 import com.takeaway.kiantestwork.dto.Restaurant
+import kotlinx.android.synthetic.main.restaurant_item.view.*
 
 class RestauranListAdapter(
     private val context: Context,
@@ -43,6 +44,10 @@ class RestauranListAdapter(
 
     inner class RestaurantViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bindView(restaurant: Restaurant) {
+            itemView.tvName.text = restaurant.name
+            itemView.tvOpen.text = restaurant.status
+            itemView.tvRate.rating = restaurant.sortingValues.ratingAverage
+            itemView.tvDesc.text = "€ ${restaurant.sortingValues.averageProductPrice.toString()}"
 
         }
     }

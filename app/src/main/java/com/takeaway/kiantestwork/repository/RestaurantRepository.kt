@@ -24,7 +24,7 @@ class RestaurantRepository @Inject constructor(
     fun getRestaurantListDefaultSorting(): Single<List<Restaurant>> {
         val restaurantListType = object : TypeToken<ArrayList<Restaurant>>() { }.type
         val list:List<Restaurant> = gson.fromJson(RESPONSE_MOCK,restaurantListType)
-        return Single.just(list.sortedBy { it.status == "open" })
+        return Single.just(list.sortedByDescending { it.status == "open" })
     }
 
 }
