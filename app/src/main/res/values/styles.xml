@@ -8,4 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Loading">
+        <item name="matProg_barColor">@color/colorAccent</item>
+        <item name="matProg_progressIndeterminate">true</item>
+    </style>
+
 </resources>
