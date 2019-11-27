@@ -35,24 +35,25 @@
 
         <TextView
             android:id="@+id/tvOpen"
-            tools:text="OPEN!"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/space_2"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:textSize="@dimen/text_size_medium"
+            android:layout_marginTop="@dimen/space_1"
+            android:layout_marginEnd="@dimen/space_1"
+            android:textSize="@dimen/text_size_large"
             app:layout_constraintEnd_toEndOf="@+id/tvName"
-            app:layout_constraintTop_toBottomOf="@+id/tvName" />
+            app:layout_constraintTop_toBottomOf="@+id/tvName"
+            tools:text="OPEN!" />
 
         <TextView
             android:id="@+id/tvDesc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginTop="@dimen/space_2"
+            android:layout_marginBottom="@dimen/space_2"
+            android:layout_marginStart="@dimen/space_1"
             android:textColor="@color/colorDesc"
-            android:textSize="@dimen/text_size_small"
+            android:textSize="@dimen/text_size_medium"
+            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/tvRate"
             app:layout_constraintTop_toBottomOf="@+id/tvOpen"
@@ -62,7 +63,7 @@
             android:id="@+id/tvRate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="@dimen/space_2"
             android:backgroundTint="@color/colorRate"
             android:isIndicator="true"
             android:scaleX=".4"
@@ -75,10 +76,11 @@
 
         <ImageView
             android:id="@+id/imgLike"
+            android:contentDescription="@string/image_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/space_2"
-            android:tint="@color/colorAccent"
+            android:tint="@color/colorLike"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/tvOpen"
             app:srcCompat="@drawable/ic_heart_outline" />
