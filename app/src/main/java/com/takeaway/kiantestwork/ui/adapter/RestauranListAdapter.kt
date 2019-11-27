@@ -37,8 +37,7 @@ class RestauranListAdapter(
     override fun onBindViewHolder(holder: RestaurantViewHolder, position: Int) {
         val item = restaurants[position]
         holder.bindView(item)
-        holder.itemView.setOnClickListener { onClick(item) }
-        //TODO : set onclick for favorite
+        holder.itemView.imgLike.setOnClickListener { onClick(item) }
     }
 
 
@@ -47,7 +46,12 @@ class RestauranListAdapter(
             itemView.tvName.text = restaurant.name
             itemView.tvOpen.text = restaurant.status
             itemView.tvRate.rating = restaurant.sortingValues.ratingAverage
-            itemView.tvDesc.text = "€ ${restaurant.sortingValues.averageProductPrice.toString()}"
+            itemView.tvDesc.text = "€ ${restaurant.sortingValues.averageProductPrice}"
+            itemView.imgLike.apply {
+                if (restaurant.isFavorite)
+                    setImageResource(R.drawable.ic_heart_filled)
+                else setImageResource(R.drawable.ic_heart_outline)
+            }
 
         }
     }
