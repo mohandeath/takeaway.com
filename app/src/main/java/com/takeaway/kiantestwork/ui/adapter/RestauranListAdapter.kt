@@ -1,5 +1,6 @@
 package com.takeaway.kiantestwork.ui.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.takeaway.kiantestwork.R
 import com.takeaway.kiantestwork.dto.Restaurant
+import com.takeaway.kiantestwork.dto.SortType
 import kotlinx.android.synthetic.main.restaurant_item.view.*
 
 class RestauranListAdapter(
@@ -17,9 +19,9 @@ class RestauranListAdapter(
 
     private var restaurants: MutableList<Restaurant> = ArrayList()
 
+    private var sortType: SortType = SortType.DEFAULT_STATUS
 
-
-    fun setItems(items: List<Restaurant>) {
+    fun setItems(items: List<Restaurant>, sortType: SortType) {
         this.restaurants.clear()
         this.restaurants.addAll(items)
         notifyDataSetChanged()
@@ -42,6 +44,7 @@ class RestauranListAdapter(
 
 
     inner class RestaurantViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        @SuppressLint("SetTextI18n")
         fun bindView(restaurant: Restaurant) {
             itemView.tvName.text = restaurant.name
             itemView.tvOpen.text = restaurant.status

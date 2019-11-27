@@ -1,12 +1,13 @@
 package com.takeaway.kiantestwork.viewmodels
 
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.MutableLiveData
 import com.takeaway.kiantestwork.dto.Restaurant
+import com.takeaway.kiantestwork.dto.SortType
 import com.takeaway.kiantestwork.repository.RestaurantRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class RestaurantListViewModel @Inject constructor(
@@ -16,16 +17,18 @@ class RestaurantListViewModel @Inject constructor(
     val loadingVisibility = MutableLiveData<Int>().apply { value = View.GONE }
     val retryVisibility = MutableLiveData<Int>().apply { value = View.GONE }
     val errorMessage = MutableLiveData<String>()
-    var sortType: String = "open"
+    var sortType: SortType = SortType.DEFAULT_STATUS
         set(value) = loadRestaurants(value)
 
-    private fun loadRestaurants(type: String) {
-        repository.getRestaurantListDefaultSorting()
+    private fun loadRestaurants(type: SortType) {
+        loadingVisibility.value = View.VISIBLE
+
+        repository.getRestaurantListDefaultSorting(type)
             .subscribeOn(Schedulers.io())
+            .delay(3,TimeUnit.SECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { restaurants ->
-                    Log.e("myLOG", "restaurants are ${restaurants.size}")
                     restaurantList.value = restaurants
                     loadingVisibility.value = View.GONE
                     retryVisibility.value = View.GONE

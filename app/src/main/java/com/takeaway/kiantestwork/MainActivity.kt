@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.takeaway.kiantestwork.di.DaggerViewModelFactory
+import com.takeaway.kiantestwork.dto.SortType
 import com.takeaway.kiantestwork.ui.adapter.RestauranListAdapter
 import com.takeaway.kiantestwork.viewmodels.RestaurantListViewModel
 import dagger.android.support.DaggerAppCompatActivity
@@ -27,11 +28,11 @@ class MainActivity : DaggerAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupViews()
-        setupViewModel("statuss")
+        setupViewModel(SortType.DEFAULT_STATUS)
         observeChanges()
     }
 
-    private fun setupViewModel(sortType: String) {
+    private fun setupViewModel(sortType: SortType) {
         viewModel =
             ViewModelProviders.of(this, viewModelFactory).get(RestaurantListViewModel::class.java)
         viewModel.sortType = sortType
@@ -50,7 +51,7 @@ class MainActivity : DaggerAppCompatActivity() {
 
     private fun observeChanges() {
         viewModel.restaurantList.observe(this, Observer {
-            adapter.setItems(it)
+            adapter.setItems(it,SortType.DEFAULT_STATUS)
         })
 
         viewModel.loadingVisibility.observe(this, Observer {

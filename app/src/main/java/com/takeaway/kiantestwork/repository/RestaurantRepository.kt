@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.takeaway.kiantestwork.RESPONSE_MOCK
 import com.takeaway.kiantestwork.dto.Restaurant
+import com.takeaway.kiantestwork.dto.SortType
 import io.reactivex.Single
 import javax.inject.Inject
 
@@ -21,7 +22,7 @@ class RestaurantRepository @Inject constructor(
 
 
 
-    fun getRestaurantListDefaultSorting(): Single<List<Restaurant>> {
+    fun getRestaurantListDefaultSorting(sortType: SortType): Single<List<Restaurant>> {
         val restaurantListType = object : TypeToken<ArrayList<Restaurant>>() { }.type
         val list:List<Restaurant> = gson.fromJson(RESPONSE_MOCK,restaurantListType)
         return Single.just(list.sortedByDescending { it.status == "open" })

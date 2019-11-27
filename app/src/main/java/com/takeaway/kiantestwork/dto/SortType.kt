@@ -1,6 +1,7 @@
 package com.takeaway.kiantestwork.dto
 
-enum class SortItem(val key: String) {
+enum class SortType(val key: String) {
+    DEFAULT_STATUS("sort by availability"),
     NEWEST("sort_by_newest"),
     BEST_MATCH("sort_by_best_match"),
     DISTANCE("sort_by_distance"),
