@@ -4,5 +4,7 @@
     <string name="str_error_general">THERE ARE SOME PROBLEMS LOADING ITEMS. PLEASE CHECK LOGS</string>
     <string name="image_like">Image Like</string>
     <string name="strSearch">Enter the Restaurant\'s name</string>
+    <string name="searchHint">Enter the name of the restaurant</string>
+    <string name="sortDialogueTitle">Choose The Sorting</string>
 
 </resources>

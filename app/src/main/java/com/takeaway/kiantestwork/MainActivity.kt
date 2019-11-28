@@ -1,7 +1,10 @@
 package com.takeaway.kiantestwork
 
 import android.os.Bundle
+import android.view.Menu
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,14 +31,23 @@ class MainActivity : DaggerAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupViews()
-        setupViewModel(SortType.DEFAULT_STATUS)
+        setupViewModel()
         observeChanges()
     }
 
-    private fun setupViewModel(sortType: SortType) {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_menu, menu)
+        val searchItem = menu?.findItem(R.id.actionSearch)
+        val searchView = searchItem?.actionView as SearchView
+        //searchView.setOnQueryTextListener { } //TODO
+        searchView.queryHint = getString(R.string.searchHint)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    private fun setupViewModel() {
         viewModel =
             ViewModelProviders.of(this, viewModelFactory).get(RestaurantListViewModel::class.java)
-        viewModel.sortType = sortType
+        viewModel.sortType = SortType.DEFAULT_STATUS
 
     }
 
@@ -46,16 +58,18 @@ class MainActivity : DaggerAppCompatActivity() {
         layoutManager = LinearLayoutManager(this)
         restaurantRecyclerView.adapter = adapter
         restaurantRecyclerView.layoutManager = layoutManager
+        btnSort.setOnClickListener { showSortingDialog() }
 
     }
 
     private fun observeChanges() {
         viewModel.restaurantList.observe(this, Observer {
-            adapter.setItems(it,SortType.DEFAULT_STATUS)
+            adapter.setItems(it,viewModel.sortType)
         })
 
         viewModel.loadingVisibility.observe(this, Observer {
             loading.visibility = it!!
+
         })
 
         viewModel.retryVisibility.observe(this, Observer {
@@ -68,6 +82,21 @@ class MainActivity : DaggerAppCompatActivity() {
 
         })
 
+    }
+
+    private fun showSortingDialog() {
+        val listItems = viewModel.sorting.map { it.key }.toTypedArray()
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle(getString(R.string.sortDialogueTitle))
+        val currentItem = viewModel.getCurrentSortIndex()
+        builder.setSingleChoiceItems(listItems, currentItem) { dialog, selected ->
+            viewModel.sortType = viewModel.sorting[selected]
+            dialog.dismiss()
+        }
+
+        val dialog = builder.create()
+        dialog.show()
     }
 
 }

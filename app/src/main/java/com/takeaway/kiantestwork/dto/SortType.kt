@@ -1,13 +1,13 @@
 package com.takeaway.kiantestwork.dto
 
 enum class SortType(val key: String) {
-    DEFAULT_STATUS("sort by availability"),
-    NEWEST("sort_by_newest"),
-    BEST_MATCH("sort_by_best_match"),
-    DISTANCE("sort_by_distance"),
-    POPULARITY("sort_by_popularity"),
-    AVERAGE_RATING("sort_by_average_rating"),
-    AVERAGE_PRICE("sort_by_average_price"),
-    MINIMUM_COST("sort_by_minimum_cost"),
-    DELIVERY_COST("sort_by_delivery_cost"),
+    DEFAULT_STATUS("Availability"),
+    NEWEST("Newest"),
+    BEST_MATCH("Best Match"),
+    DISTANCE("Nearest"),
+    POPULARITY("Popularity"),
+    AVERAGE_RATING("Average Rate"),
+    AVERAGE_PRICE("Lowest Average Price"),
+    MINIMUM_COST("Minimum Cost"),
+    DELIVERY_COST("Delivery Cost"),
 }
