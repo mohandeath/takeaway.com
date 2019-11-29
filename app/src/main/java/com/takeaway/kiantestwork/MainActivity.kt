@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.takeaway.kiantestwork.di.DaggerViewModelFactory
-import com.takeaway.kiantestwork.dto.SortType
+import com.takeaway.kiantestwork.data.dto.SortType
 import com.takeaway.kiantestwork.ui.adapter.RestauranListAdapter
 import com.takeaway.kiantestwork.viewmodels.RestaurantListViewModel
 import dagger.android.support.DaggerAppCompatActivity

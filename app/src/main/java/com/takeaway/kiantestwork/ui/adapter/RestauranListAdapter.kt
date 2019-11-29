@@ -1,14 +1,13 @@
 package com.takeaway.kiantestwork.ui.adapter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.takeaway.kiantestwork.R
-import com.takeaway.kiantestwork.dto.Restaurant
-import com.takeaway.kiantestwork.dto.SortType
+import com.takeaway.kiantestwork.data.dto.Restaurant
+import com.takeaway.kiantestwork.data.dto.SortType
 import kotlinx.android.synthetic.main.restaurant_item.view.*
 
 class RestauranListAdapter(

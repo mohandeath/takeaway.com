@@ -1,4 +1,4 @@
-package com.takeaway.kiantestwork.dto
+package com.takeaway.kiantestwork.data.dto
 
 enum class SortType(val key: String) {
     DEFAULT_STATUS("Availability"),

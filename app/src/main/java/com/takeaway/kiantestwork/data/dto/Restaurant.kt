@@ -1,6 +1,4 @@
-package com.takeaway.kiantestwork.dto
-
-import dagger.multibindings.IntoMap
+package com.takeaway.kiantestwork.data.dto
 
 
 /**

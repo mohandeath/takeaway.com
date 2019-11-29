@@ -2,12 +2,11 @@ package com.takeaway.kiantestwork.viewmodels
 
 import android.view.View
 import androidx.lifecycle.MutableLiveData
-import com.takeaway.kiantestwork.dto.Restaurant
-import com.takeaway.kiantestwork.dto.SortType
-import com.takeaway.kiantestwork.repository.RestaurantRepository
+import com.takeaway.kiantestwork.data.dto.Restaurant
+import com.takeaway.kiantestwork.data.dto.SortType
+import com.takeaway.kiantestwork.data.repository.RestaurantRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class RestaurantListViewModel @Inject constructor(
