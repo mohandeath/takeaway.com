@@ -1,10 +1,10 @@
-package com.takeaway.kiantestwork.data.datasources
+package com.takeaway.kiantestwork.data.datasources.local
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.takeaway.kiantestwork.RESPONSE_MOCK
+import com.takeaway.kiantestwork.data.datasources.IDataSource
 import com.takeaway.kiantestwork.data.dto.Restaurant
-import io.reactivex.Single
 import javax.inject.Inject
 
 class LocalDataSource @Inject constructor(

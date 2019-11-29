@@ -2,7 +2,7 @@ package com.takeaway.kiantestwork
 
 
 
-
+const val DATABASE_NAME = "takeaway_db"
 
 
 
