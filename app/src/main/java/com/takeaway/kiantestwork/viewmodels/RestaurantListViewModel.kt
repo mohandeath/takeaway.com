@@ -62,11 +62,14 @@ class RestaurantListViewModel @Inject constructor(
 
         result
             .subscribeOn(Schedulers.io())
-            .delay(1, TimeUnit.SECONDS)
+            .delay(1, TimeUnit.SECONDS) // just to give a smooth user experience
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { restaurants ->
-                    restaurantList.value = restaurants
+                    if (restaurants.isEmpty())
+                        infoMessage.value = "Unfortunately,There are no matching result!"
+                    else
+                        restaurantList.value = restaurants
                     loadingVisibility.value = View.GONE
                     retryVisibility.value = View.GONE
                 }, { error ->
