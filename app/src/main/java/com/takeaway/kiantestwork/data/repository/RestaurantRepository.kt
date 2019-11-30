@@ -22,11 +22,17 @@ class RestaurantRepository @Inject constructor(
         return dataSource.createRestaurant(restaurant)
     }
 
-    fun removeRestaurantFromFavorites(restaurant: Restaurant):Single<Int> {
+    fun removeRestaurantFromFavorites(restaurant: Restaurant): Single<Int> {
         return dataSource.deleteRestaurant(restaurant)
     }
 
-    fun getRestaurantListDefaultSorting(sortType: SortType): Single<List<Restaurant>> {
+    fun filterRestaurantByName(sortType: SortType, query: String): Single<List<Restaurant>> {
+        return getSortedRestaurantList(sortType).map {
+            it.filter { item -> item.name.contains(query, ignoreCase = true) }
+        }
+    }
+
+    fun getSortedRestaurantList(sortType: SortType): Single<List<Restaurant>> {
 
         val restaurantList = dataSource.getRestaurantList()
 

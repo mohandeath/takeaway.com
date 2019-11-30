@@ -33,13 +33,34 @@ class RestaurantListViewModel @Inject constructor(
     var sortType: SortType = SortType.DEFAULT_STATUS
         set(value) {
             field = value
-            loadRestaurants(value)
+            loadRestaurants(value, query)
         }
 
-    private fun loadRestaurants(type: SortType) {
+    var query: String = ""
+        set(value) {
+            field = value
+            loadRestaurants(sortType, value)
+        }
+
+
+    /**
+     *
+     * @return list of restaurants sorted by `type` and filterd by `query`
+     * please notice that it optimises the results in a way that if the query
+     * is empty, it don't bother filtering the results
+     * used this method to improve the performance. it will be more helpful
+     * if we had a NetworkDataSource and cuts off loads from the server and the client in this case
+     */
+    private fun loadRestaurants(type: SortType, query: String) {
         loadingVisibility.value = View.VISIBLE
 
-        repository.getRestaurantListDefaultSorting(type)
+
+        val result =
+            if (query.isEmpty())
+                repository.getSortedRestaurantList(type)
+            else repository.filterRestaurantByName(type, query)
+
+        result
             .subscribeOn(Schedulers.io())
             .delay(1, TimeUnit.SECONDS)
             .observeOn(AndroidSchedulers.mainThread())
@@ -63,7 +84,7 @@ class RestaurantListViewModel @Inject constructor(
         repository.addRestaurantToFavorites(restaurant).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                loadRestaurants(sortType)
+                loadRestaurants(sortType, query)
                 infoMessage.value = " ${restaurant.name} has been added from favorites!"
 
             }, {
@@ -78,7 +99,7 @@ class RestaurantListViewModel @Inject constructor(
         repository.removeRestaurantFromFavorites(restaurant).subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                loadRestaurants(sortType)
+                loadRestaurants(sortType, query)
                 infoMessage.value = " ${restaurant.name} has been removed from favorites!"
 
             }, {

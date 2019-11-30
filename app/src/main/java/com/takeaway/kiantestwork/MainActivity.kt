@@ -6,16 +6,24 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.takeaway.kiantestwork.data.dto.SortType
 import com.takeaway.kiantestwork.di.DaggerViewModelFactory
 import com.takeaway.kiantestwork.ui.adapter.RestauranListAdapter
+import com.takeaway.kiantestwork.ui.adapter.getOnTextChangeObservable
 import com.takeaway.kiantestwork.viewmodels.RestaurantListViewModel
 import dagger.android.support.DaggerAppCompatActivity
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.Predicate
+import io.reactivex.rxkotlin.addTo
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.item_loading.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class MainActivity : DaggerAppCompatActivity() {
@@ -23,7 +31,7 @@ class MainActivity : DaggerAppCompatActivity() {
 
     @Inject
     lateinit var viewModelFactory: DaggerViewModelFactory
-    lateinit var viewModel: RestaurantListViewModel
+    private lateinit var viewModel: RestaurantListViewModel
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: RestauranListAdapter
 
@@ -39,9 +47,27 @@ class MainActivity : DaggerAppCompatActivity() {
         menuInflater.inflate(R.menu.main_menu, menu)
         val searchItem = menu?.findItem(R.id.actionSearch)
         val searchView = searchItem?.actionView as SearchView
-        //searchView.setOnQueryTextListener { } //TODO
-        searchView.queryHint = getString(R.string.searchHint)
+        setupSearchViewBehaviour(searchView)
         return super.onCreateOptionsMenu(menu)
+    }
+
+    /**
+     *  used Rx to reduce irrelevant calls, this can saves lots of
+     *  unnecessary calls to repository and it will be really helpful
+     *  specially in case that we want to make searches from a network calls in a real-world app
+     */
+    private fun setupSearchViewBehaviour(searchView: SearchView) {
+        searchView.queryHint = getString(R.string.searchHint)
+        searchView.getOnTextChangeObservable()
+            .debounce(10, TimeUnit.MILLISECONDS)
+            .distinctUntilChanged()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { query ->
+                viewModel.query = query
+            }.addTo(CompositeDisposable())
+
+
     }
 
     private fun setupViewModel() {

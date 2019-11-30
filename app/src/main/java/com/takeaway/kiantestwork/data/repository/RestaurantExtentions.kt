@@ -25,12 +25,12 @@ fun List<Restaurant>.sortRestaurant(
         }
         SortType.DELIVERY_COST -> {
             sortedWith(
-                sortedByStatus.thenByDescending { it.sortingValues.deliveryCosts }
+                sortedByStatus.thenBy { it.sortingValues.deliveryCosts }
             )
         }
         SortType.NEWEST -> {
             sortedWith(
-                sortedByStatus.thenBy { it.sortingValues.newest }
+                sortedByStatus.thenByDescending { it.sortingValues.newest }
             )
         }
         SortType.DISTANCE -> {
