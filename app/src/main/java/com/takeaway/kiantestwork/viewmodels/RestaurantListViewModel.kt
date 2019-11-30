@@ -68,8 +68,8 @@ class RestaurantListViewModel @Inject constructor(
                 { restaurants ->
                     if (restaurants.isEmpty())
                         infoMessage.value = "Unfortunately,There are no matching result!"
-                    else
-                        restaurantList.value = restaurants
+
+                    restaurantList.value = restaurants
                     loadingVisibility.value = View.GONE
                     retryVisibility.value = View.GONE
                 }, { error ->

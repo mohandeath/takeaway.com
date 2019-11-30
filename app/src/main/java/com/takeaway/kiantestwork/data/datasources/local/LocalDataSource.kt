@@ -8,6 +8,12 @@ import com.takeaway.kiantestwork.data.dto.Restaurant
 import io.reactivex.Single
 import javax.inject.Inject
 
+
+/**
+ * in real app this could be a network call or even seeding from a local database
+ * but here i tried to load it from a local variable
+ * (please notice that if the given json file was too large i would load it from a file)
+ */
 class LocalDataSource @Inject constructor(
     private val gson: Gson,
     private val dao: RestaurantDAO

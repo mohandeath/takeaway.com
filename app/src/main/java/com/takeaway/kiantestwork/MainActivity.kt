@@ -65,7 +65,7 @@ class MainActivity : DaggerAppCompatActivity() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { query ->
                 viewModel.query = query
-            }.addTo(CompositeDisposable())
+            }.addTo(CompositeDisposable()) //TODO  handle this on baseActivity on lifecycle
 
 
     }
