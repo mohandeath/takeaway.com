@@ -1,6 +1,7 @@
 package com.takeaway.kiantestwork.data.dto
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -9,7 +10,7 @@ import androidx.room.PrimaryKey
  * mapping jsons to POJO/DTO files
  * notice that there's an extra field that we are later
  * setting favorite state and map the outputs
- *
+ *  overrides the equals() and hashcode() to avoid adding duplicate
  */
 
 @Entity(
@@ -23,17 +24,24 @@ data class Restaurant(
     @ColumnInfo(name = "status")
     val status: String,
 
-    @ColumnInfo(name = "sortValues")
+    @Embedded
     val sortingValues: SortingValue,
 
     @ColumnInfo(name = "favorite")
-    val isFavorite: Boolean
-)
+    var isFavorite: Boolean
+) {
+    override fun equals(other: Any?): Boolean {
+        return this.hashCode() == other.hashCode()
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + status.hashCode()
+        return result
+    }
+}
 
 
-@Entity(
-    tableName = "sort_value"
-)
 data class SortingValue(
 
     @ColumnInfo(name = "bestMatch")
@@ -41,7 +49,7 @@ data class SortingValue(
 
     @ColumnInfo(name = "newest")
     val newest: Float,
-    @ColumnInfo(name = "bestMatch")
+    @ColumnInfo(name = "ratingAverage")
     val ratingAverage: Float,
     @ColumnInfo(name = "distance")
     val distance: Int,

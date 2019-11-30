@@ -7,6 +7,7 @@ import com.takeaway.kiantestwork.data.dto.SortType
 import com.takeaway.kiantestwork.data.repository.RestaurantRepository
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class RestaurantListViewModel @Inject constructor(
@@ -15,7 +16,8 @@ class RestaurantListViewModel @Inject constructor(
     val restaurantList = MutableLiveData<List<Restaurant>>().apply { value = ArrayList() }
     val loadingVisibility = MutableLiveData<Int>().apply { value = View.GONE }
     val retryVisibility = MutableLiveData<Int>().apply { value = View.GONE }
-
+    val errorMessage = MutableLiveData<String>()
+    val infoMessage = MutableLiveData<String>()
     val sorting = listOf(
         SortType.DEFAULT_STATUS,
         SortType.BEST_MATCH,
@@ -28,7 +30,6 @@ class RestaurantListViewModel @Inject constructor(
         SortType.DELIVERY_COST
     )
 
-    val errorMessage = MutableLiveData<String>()
     var sortType: SortType = SortType.DEFAULT_STATUS
         set(value) {
             field = value
@@ -40,7 +41,7 @@ class RestaurantListViewModel @Inject constructor(
 
         repository.getRestaurantListDefaultSorting(type)
             .subscribeOn(Schedulers.io())
-            //     .delay(2, TimeUnit.SECONDS)
+            .delay(1, TimeUnit.SECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 { restaurants ->
@@ -56,6 +57,35 @@ class RestaurantListViewModel @Inject constructor(
                 })
             .also { addToUnsubscribe(it) }
 
+    }
+
+    fun addRestaurantToFavorites(restaurant: Restaurant) {
+        repository.addRestaurantToFavorites(restaurant).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                loadRestaurants(sortType)
+                infoMessage.value = " ${restaurant.name} has been added from favorites!"
+
+            }, {
+                it.printStackTrace()
+                errorMessage.value = it.message
+
+
+            }).also { addToUnsubscribe(it) }
+    }
+
+    fun removeRestaurantFromFavorites(restaurant: Restaurant) {
+        repository.removeRestaurantFromFavorites(restaurant).subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                loadRestaurants(sortType)
+                infoMessage.value = " ${restaurant.name} has been removed from favorites!"
+
+            }, {
+                it.printStackTrace()
+                errorMessage.value = it.message
+
+            }).also { addToUnsubscribe(it) }
     }
 
     fun getCurrentSortIndex() = sorting.indexOf(sortType)

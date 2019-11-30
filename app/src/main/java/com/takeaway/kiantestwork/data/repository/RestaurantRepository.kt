@@ -1,11 +1,9 @@
 package com.takeaway.kiantestwork.data.repository
 
-import android.content.SharedPreferences
 import com.takeaway.kiantestwork.data.datasources.local.LocalDataSource
 import com.takeaway.kiantestwork.data.dto.Restaurant
 import com.takeaway.kiantestwork.data.dto.SortType
 import io.reactivex.Single
-
 import javax.inject.Inject
 
 /**
@@ -16,17 +14,28 @@ import javax.inject.Inject
  * but i've tried to show what it's like in a real world application!
  */
 class RestaurantRepository @Inject constructor(
-    private val dataSource: LocalDataSource,
-    private val sharedPreferences: SharedPreferences
+    private val dataSource: LocalDataSource
 ) {
 
-    fun addRestaurantToFavorites(restaurant: Restaurant){
+    fun addRestaurantToFavorites(restaurant: Restaurant): Single<Long> {
+        restaurant.isFavorite = true
+        return dataSource.createRestaurant(restaurant)
+    }
 
+    fun removeRestaurantFromFavorites(restaurant: Restaurant):Single<Int> {
+        return dataSource.deleteRestaurant(restaurant)
     }
 
     fun getRestaurantListDefaultSorting(sortType: SortType): Single<List<Restaurant>> {
 
-        return Single.just(dataSource.getRestaurantList().sortRestaurant(sortType))
+        val restaurantList = dataSource.getRestaurantList()
+
+        val favoriteRestaurants = dataSource.getFavoriteRestaurants()
+
+        //val result = favoriteRestaurants.union(restaurantList).toList()
+        return favoriteRestaurants.map {
+            it.union(restaurantList).toList().sortRestaurant(sortType)
+        }
     }
 
 }

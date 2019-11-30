@@ -8,7 +8,8 @@ fun List<Restaurant>.sortRestaurant(
     sortType: SortType
 ): List<Restaurant> {
     val sortedByStatus =
-        compareByDescending<Restaurant> { it.status == "open" }.thenByDescending { it.status == "order ahead" }
+        compareByDescending<Restaurant> { it.isFavorite }.thenByDescending { it.status == "open" }
+            .thenByDescending { it.status == "order ahead" }
     return when (sortType) {
 
         SortType.DEFAULT_STATUS -> {

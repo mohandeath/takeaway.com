@@ -2,15 +2,15 @@ package com.takeaway.kiantestwork
 
 import android.os.Bundle
 import android.view.Menu
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.takeaway.kiantestwork.di.DaggerViewModelFactory
+import com.google.android.material.snackbar.Snackbar
 import com.takeaway.kiantestwork.data.dto.SortType
+import com.takeaway.kiantestwork.di.DaggerViewModelFactory
 import com.takeaway.kiantestwork.ui.adapter.RestauranListAdapter
 import com.takeaway.kiantestwork.viewmodels.RestaurantListViewModel
 import dagger.android.support.DaggerAppCompatActivity
@@ -53,7 +53,11 @@ class MainActivity : DaggerAppCompatActivity() {
 
     private fun setupViews() {
         adapter = RestauranListAdapter(this) { restaurant ->
-            Toast.makeText(this, "you have clicked on ${restaurant.name}", Toast.LENGTH_LONG).show()
+            if (!restaurant.isFavorite)
+                viewModel.addRestaurantToFavorites(restaurant)
+            else
+                viewModel.removeRestaurantFromFavorites(restaurant)
+
         }
         layoutManager = LinearLayoutManager(this)
         restaurantRecyclerView.adapter = adapter
@@ -64,7 +68,9 @@ class MainActivity : DaggerAppCompatActivity() {
 
     private fun observeChanges() {
         viewModel.restaurantList.observe(this, Observer {
-            adapter.setItems(it,viewModel.sortType)
+            adapter.setItems(it, viewModel.sortType)
+            restaurantRecyclerView.smoothScrollToPosition(0)
+
         })
 
         viewModel.loadingVisibility.observe(this, Observer {
@@ -77,8 +83,19 @@ class MainActivity : DaggerAppCompatActivity() {
         })
 
         viewModel.errorMessage.observe(this, Observer {
-            Toast.makeText(this, getString(R.string.str_error_general), Toast.LENGTH_LONG).show()
+            Snackbar.make(
+                restaurantRecyclerView,
+                getString(R.string.str_error_general),
+                Snackbar.LENGTH_LONG
+            ).show()
 
+        })
+        viewModel.infoMessage.observe(this, Observer { message ->
+            Snackbar.make(
+                restaurantRecyclerView,
+                message,
+                Snackbar.LENGTH_LONG
+            ).show()
 
         })
 
