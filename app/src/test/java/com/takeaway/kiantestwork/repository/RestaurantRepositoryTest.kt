@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.takeaway.kiantestwork.repository
 
 import com.google.gson.GsonBuilder
@@ -9,7 +11,6 @@ import com.takeaway.kiantestwork.data.datasources.local.LocalDataSource
 import com.takeaway.kiantestwork.data.dto.Restaurant
 import com.takeaway.kiantestwork.data.dto.SortType
 import com.takeaway.kiantestwork.data.repository.RestaurantRepository
-import com.takeaway.kiantestwork.maxByShowLast
 import io.reactivex.Single
 import junit.framework.Assert.assertEquals
 import org.junit.Before
@@ -19,7 +20,9 @@ import org.junit.Test
 /**
  * usually we would mock the whole NetworkService's result
  * I might implement it another way in a real app but i think
- * this is well-balanced for the scope of this project
+ * this is well-balanced for the scope of this project.
+ * tried to make the tests as generic as possible.
+ * in order to make less changes if the dataset needs to be changed
  */
 class RestaurantRepositoryTest : BaseTest() {
     private lateinit var repository: RestaurantRepository
@@ -27,7 +30,7 @@ class RestaurantRepositoryTest : BaseTest() {
     private lateinit var restaurants: List<Restaurant>
     private val gson = GsonBuilder().create()
 
-    fun initRestaurantList() {
+    private fun initRestaurantList() {
         val restaurantListType = object : TypeToken<ArrayList<Restaurant>>() {}.type
         restaurants = gson.fromJson(RESPONSE_MOCK, restaurantListType)
         //making two restaurants favorite by default
@@ -44,13 +47,13 @@ class RestaurantRepositoryTest : BaseTest() {
 
         dataSource = mock {
             on { getRestaurantList() } doReturn restaurants
-            on { createRestaurant(any()) } doAnswer {
+            on { createRestaurant(restaurants[2]) } doAnswer {
                 restaurants[2].isFavorite = true
-                Single.just(any())
+                Single.just(1)
             }
-            on { deleteRestaurant(any()) } doAnswer {
+            on { deleteRestaurant(restaurants[2]) } doAnswer {
                 restaurants[2].isFavorite = false
-                Single.just(any())
+                Single.just(1)
             }
             on { getFavoriteRestaurants() } doReturn Single.just(restaurants.filter { it.isFavorite })
 
@@ -67,16 +70,11 @@ class RestaurantRepositoryTest : BaseTest() {
 
     }
 
-    @Test
-    fun `get sorted restaurant returns the favorites on top of the list`() {
-        val sortedList = repository.getSortedRestaurantList(SortType.DEFAULT_STATUS).blockingGet()
-        assertEquals(sortedList.first().isFavorite, true)
-    }
 
     @Test
-    fun `last item of list have to be a closed restauratn`() {
+    fun `last item of list has to be a closed restaurant`() {
         val sortedList = repository.getSortedRestaurantList(SortType.DEFAULT_STATUS).blockingGet()
-        assertEquals(sortedList.first().status, "closed")
+        assertEquals(sortedList.last().status, "closed")
     }
 
 
@@ -86,81 +84,274 @@ class RestaurantRepositoryTest : BaseTest() {
      * 1. favorites on top
      * 2. open -> order ahead -> closed
      * 3. each section should be sorted by the sorting value
+     * (in scenario 3.we exclude favorites because there are not much favorite items in order to thest the favorites
+     *  but they are in order and we should pass another dataset to test them as well. ther have no difference in coding)
      */
-    private fun checkFavoritesOnTop(list: List<Restaurant>) {
-        val firstFavorideIndex = list.indexOfFirst { it.isFavorite }
-        val firstNormalItemIndex = list.indexOfLast { !it.isFavorite }
-        assert(firstFavorideIndex < firstNormalItemIndex)
-    }
 
 
-    private fun checkOrderInAvailability(list: List<Restaurant>) {
-        val lastOpenIndex = list.indexOfLast { it.status == "open" }
-        val firstOrderAheadIndex = list.indexOfFirst { it.status == "order ahead" }
-        assert(lastOpenIndex < firstOrderAheadIndex)
-
-        val lastOrderAheadIndex = list.indexOfLast { it.status == "order ahead" }
-        val firstClosedIndex = list.indexOfFirst { it.status == "closed" }
-        assert(lastOrderAheadIndex < firstClosedIndex)
+    @Test
+    fun `check adding item to favorites works`() {
+        repository.addRestaurantToFavorites(restaurants[2])
+        assertEquals(4, restaurants.filter { it.isFavorite }.size)
     }
 
     @Test
-    fun `Test Sort By Minimum Cost`() {
+    fun `check removing item from favorites works`() {
+        repository.removeRestaurantFromFavorites(restaurants[2])
+        assertEquals(3, restaurants.filter { it.isFavorite }.size)
+    }
+
+    @Test
+    fun `Sort By Minimum Cost favorites are on top`() {
         val sortedList = repository.getSortedRestaurantList(SortType.MINIMUM_COST).blockingGet()
+
         checkFavoritesOnTop(sortedList)
-        // checking availability for the favorites and also the rest of the lits
+
+    }
+
+    @Test
+    fun `Sort By Minimum Cost puts restaurants in right Availability Order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.MINIMUM_COST).blockingGet()
         val favorites = sortedList.filter { it.isFavorite }
         val nonFavorites = sortedList.filter { !it.isFavorite }
 
-        //this part of code may break if you change the dataset to another one with no or less favorites
+        //this part of code may break if you change the data set to another one with no or less favorites
         checkOrderInAvailability(favorites)
 
         checkOrderInAvailability(nonFavorites)
+    }
 
-        //minimum value of the sortType should be the first element in the list and max value at the last
-        // we do it per each status type cause it should be sorted per each one of them
+    @Test
+    fun `Sort By Minimum Cost Puts items in right order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.MINIMUM_COST).blockingGet()
 
-        val nonFavoriteOpen = nonFavorites.filter { it.status == "open" }
-        assertEquals(0,
-            nonFavoriteOpen.indexOf(
-                nonFavoriteOpen.minBy { it.sortingValues.minCost })
-        )
-        assertEquals( nonFavoriteOpen.lastIndex,
-            nonFavoriteOpen.indexOf(
-                    nonFavoriteOpen.maxByShowLast { it.sortingValues.minCost })
+        sortedList.filter { !it.isFavorite }
+            .checkIfListSortedAscendingProperly { it.sortingValues.minCost }
 
-        )
+    }
 
 
-        val nonFavoriteOrderAhead = nonFavorites.filter { it.status == "order ahead" }
-        assertEquals(0,
-            nonFavoriteOrderAhead.indexOf(
-                nonFavoriteOrderAhead.minBy { it.sortingValues.minCost })
-        )
+    @Test
+    fun `Sort By Average Price favorites are on top`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.AVERAGE_PRICE).blockingGet()
 
-        assertEquals( nonFavoriteOrderAhead.lastIndex,
-            nonFavoriteOrderAhead.indexOf(
-                nonFavoriteOrderAhead.maxByShowLast { it.sortingValues.minCost })
+        checkFavoritesOnTop(sortedList)
 
-        )
+    }
 
-        val nonFavoriteClosed = nonFavorites.filter { it.status == "closed" }
-        assertEquals(0,
-            nonFavoriteClosed.indexOf(
-                nonFavoriteClosed.minBy { it.sortingValues.minCost })
-        )
+    @Test
+    fun `Sort By Average Price puts restaurants in right Availability Order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.AVERAGE_PRICE).blockingGet()
+        val favorites = sortedList.filter { it.isFavorite }
+        val nonFavorites = sortedList.filter { !it.isFavorite }
 
-        assertEquals( nonFavoriteClosed.lastIndex,
-            nonFavoriteClosed.indexOf(
-                nonFavoriteClosed.maxByShowLast { it.sortingValues.minCost })
-            )
+        //this part of code may break if you change the data set to another one with no or less favorites
+        checkOrderInAvailability(favorites)
+
+        checkOrderInAvailability(nonFavorites)
+    }
+
+    @Test
+    fun `Sort By Average Price Puts items in right order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.AVERAGE_PRICE).blockingGet()
+
+        sortedList.filter { !it.isFavorite }
+            .checkIfListSortedAscendingProperly { it.sortingValues.averageProductPrice }
+
+    }
+
+    @Test
+    fun `Sort By Delivery Cost favorites are on top`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.DELIVERY_COST).blockingGet()
+
+        checkFavoritesOnTop(sortedList)
+
+    }
+
+    @Test
+    fun `Sort By Delivery Cost puts restaurants in right Availability Order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.DELIVERY_COST).blockingGet()
+        val favorites = sortedList.filter { it.isFavorite }
+        val nonFavorites = sortedList.filter { !it.isFavorite }
+
+        //this part of code may break if you change the data set to another one with no or less favorites
+        checkOrderInAvailability(favorites)
+
+        checkOrderInAvailability(nonFavorites)
+    }
+
+    @Test
+    fun `Sort By Delivery Cost Puts items in right order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.DELIVERY_COST).blockingGet()
+
+        sortedList.filter { !it.isFavorite }
+            .checkIfListSortedAscendingProperly { it.sortingValues.deliveryCosts }
+
+    }
 
 
+    @Test
+    fun `Sort By Popularity puts restaurants in right Availability Order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.POPULARITY).blockingGet()
+        val favorites = sortedList.filter { it.isFavorite }
+        val nonFavorites = sortedList.filter { !it.isFavorite }
+
+        //this part of code may break if you change the data set to another one with no or less favorites
+        checkOrderInAvailability(favorites)
+
+        checkOrderInAvailability(nonFavorites)
+    }
+
+    @Test
+    fun `Sort By Popularity puts favorites are on top`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.POPULARITY).blockingGet()
+
+        checkFavoritesOnTop(sortedList)
+
+    }
+
+    @Test
+    fun `Sort By Popularity Puts items in right order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.POPULARITY).blockingGet()
+
+        sortedList.filter { !it.isFavorite }
+            .checkIfListSortedDescendingProperly { it.sortingValues.popularity }
+
+    }
 
 
+    @Test
+    fun `Sort By Best Match favorites are on top`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.BEST_MATCH).blockingGet()
+
+        checkFavoritesOnTop(sortedList)
+
+    }
+
+    @Test
+    fun `Sort By Best Match puts restaurants in right Availability Order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.BEST_MATCH).blockingGet()
+        val favorites = sortedList.filter { it.isFavorite }
+        val nonFavorites = sortedList.filter { !it.isFavorite }
+
+        //this part of code may break if you change the data set to another one with no or less favorites
+        checkOrderInAvailability(favorites)
+
+        checkOrderInAvailability(nonFavorites)
+    }
+
+    @Test
+    fun `Sort By Best Match Puts items in right order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.BEST_MATCH).blockingGet()
+
+        sortedList.filter { !it.isFavorite }
+            .checkIfListSortedDescendingProperly { it.sortingValues.bestMatch }
+
+    }
 
 
+    @Test
+    fun `Sort By Distance favorites are on top`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.DISTANCE).blockingGet()
 
+        checkFavoritesOnTop(sortedList)
+
+    }
+
+    @Test
+    fun `Sort By Distance puts restaurants in right Availability Order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.DISTANCE).blockingGet()
+        val favorites = sortedList.filter { it.isFavorite }
+        val nonFavorites = sortedList.filter { !it.isFavorite }
+
+        //this part of code may break if you change the data set to another one with no or less favorites
+        checkOrderInAvailability(favorites)
+
+        checkOrderInAvailability(nonFavorites)
+    }
+
+    @Test
+    fun `Sort By Distance Puts items in right order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.DISTANCE).blockingGet()
+
+        sortedList.filter { !it.isFavorite }
+            .checkIfListSortedAscendingProperly { it.sortingValues.distance }
+
+    }
+
+    @Test
+    fun `Sort By Average Rate favorites are on top`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.AVERAGE_RATING).blockingGet()
+
+        checkFavoritesOnTop(sortedList)
+
+    }
+
+    @Test
+    fun `Sort By Average Rate puts restaurants in right Availability Order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.AVERAGE_RATING).blockingGet()
+        val favorites = sortedList.filter { it.isFavorite }
+        val nonFavorites = sortedList.filter { !it.isFavorite }
+
+        //this part of code may break if you change the data set to another one with no or less favorites
+        checkOrderInAvailability(favorites)
+
+        checkOrderInAvailability(nonFavorites)
+    }
+
+    @Test
+    fun `Sort By Average Rate Puts items in right order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.AVERAGE_RATING).blockingGet()
+
+        sortedList.filter { !it.isFavorite }
+            .checkIfListSortedDescendingProperly { it.sortingValues.ratingAverage }
+
+    }
+
+    @Test
+    fun `Sort By Newest favorites are on top`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.NEWEST).blockingGet()
+
+        checkFavoritesOnTop(sortedList)
+
+    }
+
+    @Test
+    fun `Sort By Newest puts restaurants in right Availability Order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.NEWEST).blockingGet()
+        val favorites = sortedList.filter { it.isFavorite }
+        val nonFavorites = sortedList.filter { !it.isFavorite }
+
+        //this part of code may break if you change the data set to another one with no or less favorites
+        checkOrderInAvailability(favorites)
+
+        checkOrderInAvailability(nonFavorites)
+    }
+
+    @Test
+    fun `Sort By Newest Puts items in right order`() {
+        val sortedList = repository.getSortedRestaurantList(SortType.NEWEST).blockingGet()
+
+        sortedList.filter { !it.isFavorite }
+            .checkIfListSortedDescendingProperly { it.sortingValues.newest }
+
+    }
+
+
+    @Test
+    fun `Check Searching pizza should return just one item`() {
+        //going to check
+        val sortedList =
+            repository.filterRestaurantByName(SortType.DEFAULT_STATUS, "Pizza").blockingGet()
+        assertEquals(1, sortedList.size)
+    }
+
+
+    @Test
+    fun `Check Searching sushi should return 4 items`() {
+        val sortedList =
+            repository.filterRestaurantByName(SortType.DEFAULT_STATUS, "Sushi").blockingGet()
+        assertEquals(4, sortedList.size)
     }
 
 

@@ -35,8 +35,8 @@ class RestaurantRepository @Inject constructor(
 
         val favoriteRestaurants = dataSource.getFavoriteRestaurants()
 
-        //val result = favoriteRestaurants.union(restaurantList).toList()
         return favoriteRestaurants.map {
+            // notice that i've overrided the equal() in the Restaurant's model
             it.union(restaurantList).toList().sortRestaurant(sortType)
         }
     }

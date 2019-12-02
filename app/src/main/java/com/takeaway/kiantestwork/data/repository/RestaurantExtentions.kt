@@ -20,7 +20,7 @@ fun List<Restaurant>.sortRestaurant(
         }
         SortType.AVERAGE_PRICE -> {
             sortedWith(
-                sortedByStatus.thenByDescending { it.sortingValues.averageProductPrice }
+                sortedByStatus.thenBy { it.sortingValues.averageProductPrice }
             )
         }
         SortType.DELIVERY_COST -> {
