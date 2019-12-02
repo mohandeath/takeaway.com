@@ -20,8 +20,8 @@ class RestaurantListViewModelTest : BaseTest() {
     @get:Rule
     val rule = InstantTaskExecutorRule()
 
-    lateinit var repository: RestaurantRepository
-    lateinit var viewModel: RestaurantListViewModel
+    private lateinit var repository: RestaurantRepository
+    private lateinit var viewModel: RestaurantListViewModel
 
     @Before
     fun init() {

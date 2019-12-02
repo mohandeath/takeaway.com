@@ -1,4 +1,4 @@
-package com.takeaway.kiantestwork.ui.adapter
+package com.takeaway.kiantestwork.ui
 
 import androidx.appcompat.widget.SearchView
 import io.reactivex.Observable

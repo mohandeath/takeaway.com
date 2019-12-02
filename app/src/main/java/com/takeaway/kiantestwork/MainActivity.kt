@@ -6,19 +6,17 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.takeaway.kiantestwork.data.dto.SortType
 import com.takeaway.kiantestwork.di.DaggerViewModelFactory
 import com.takeaway.kiantestwork.ui.adapter.RestauranListAdapter
-import com.takeaway.kiantestwork.ui.adapter.getOnTextChangeObservable
+import com.takeaway.kiantestwork.ui.getOnTextChangeObservable
 import com.takeaway.kiantestwork.viewmodels.RestaurantListViewModel
 import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.Predicate
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
@@ -34,6 +32,8 @@ class MainActivity : DaggerAppCompatActivity() {
     private lateinit var viewModel: RestaurantListViewModel
     private lateinit var layoutManager: RecyclerView.LayoutManager
     private lateinit var adapter: RestauranListAdapter
+    private val disposables = CompositeDisposable()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +41,11 @@ class MainActivity : DaggerAppCompatActivity() {
         setupViews()
         setupViewModel()
         observeChanges()
+    }
+
+    override fun onDestroy() {
+        disposables.clear()
+        super.onDestroy()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -65,7 +70,7 @@ class MainActivity : DaggerAppCompatActivity() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe { query ->
                 viewModel.query = query
-            }.addTo(CompositeDisposable()) //TODO  handle this on baseActivity on lifecycle
+            }.addTo(disposables)
 
 
     }
@@ -94,6 +99,8 @@ class MainActivity : DaggerAppCompatActivity() {
 
     private fun observeChanges() {
         viewModel.restaurantList.observe(this, Observer {
+            supportActionBar?.subtitle = "Sorting value: ${viewModel.sortType.key}"
+
             adapter.setItems(it, viewModel.sortType)
             restaurantRecyclerView.smoothScrollToPosition(0)
 

@@ -43,7 +43,6 @@ class RestauranListAdapter(
     }
 
 
-    //TODO explain in comment to
     private fun getSortValueLabe(sortType: SortType, restaurant: Restaurant) = when (sortType) {
         SortType.DEFAULT_STATUS, SortType.MINIMUM_COST -> "💰 Minimum Cost : €${restaurant.sortingValues.minCost} "
         SortType.NEWEST -> "🆕 Newest : ${restaurant.sortingValues.newest}"
@@ -51,7 +50,7 @@ class RestauranListAdapter(
         SortType.DISTANCE -> "🚚 Distance : ${restaurant.sortingValues.distance} Km"
         SortType.POPULARITY -> "📈 Popularity : ${restaurant.sortingValues.popularity}"
         SortType.AVERAGE_RATING -> "⭐️ Average Rate : ${restaurant.sortingValues.ratingAverage}"
-        SortType.AVERAGE_PRICE -> "💵 Average Cost : ${restaurant.sortingValues.averageProductPrice}"
+        SortType.AVERAGE_PRICE -> "💵 Average Price € : ${restaurant.sortingValues.averageProductPrice}"
         SortType.DELIVERY_COST -> "📦 Delivery Cost € ${restaurant.sortingValues.deliveryCosts} "
     }
 

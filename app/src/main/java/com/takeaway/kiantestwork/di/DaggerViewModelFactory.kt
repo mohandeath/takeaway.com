@@ -10,7 +10,6 @@ import javax.inject.Singleton
 /**
  * A factory to create ViewModel instances that are compatible with dagger.
  * Using this factory allows injecting dependencies with dagger.
- * //todo using @Singleton makes the object singleton by dagger.
  */
 @Suppress("UNCHECKED_CAST")
 @Singleton
