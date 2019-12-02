@@ -24,7 +24,7 @@ The Application shows a list of restaurants sorted by :
 
 ## App Architecture
 I used MVVM architecture for this application.
-Seperated the layers (View -> ViewModel -> Repository -> DataSource) for scalability and easy testing
+Seperated the layers (View -> ViewModel -> Repository -> DataSource) for scalability and easy testing.
 Tried to avoid over engeneering and keep the implementation well-balanced for the scale of this solution
 with an eye for scalability in some places (like `IDataSource`).
 There are some comments in the code that explains my reasoning.
@@ -34,8 +34,10 @@ Tred to make the unit tests as generic as possible so that changes in the sample
 
 ## Wishlist
 - Adding a gridlayout for tablets in order to make the view optimised for tablets
-I've tried to make a clean and simple user interface for mobile devices
-However, I've make all @diements ready to rewrite for other screensizes
+I've tried to make a clean and simple user interface for mobile devices.
+
+However, I've make all @diements ready to rewrite for other screensizes.
+
 my focus on this solution was narrowed down into problem-solving.
 
 
