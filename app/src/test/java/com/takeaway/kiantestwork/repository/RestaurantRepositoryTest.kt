@@ -2,13 +2,9 @@
 
 package com.takeaway.kiantestwork.repository
 
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import com.nhaarman.mockitokotlin2.*
 import com.takeaway.kiantestwork.BaseTest
-import com.takeaway.kiantestwork.RESPONSE_MOCK
 import com.takeaway.kiantestwork.data.datasources.local.LocalDataSource
-import com.takeaway.kiantestwork.data.dto.Restaurant
 import com.takeaway.kiantestwork.data.dto.SortType
 import com.takeaway.kiantestwork.data.repository.RestaurantRepository
 import io.reactivex.Single
@@ -27,19 +23,7 @@ import org.junit.Test
 class RestaurantRepositoryTest : BaseTest() {
     private lateinit var repository: RestaurantRepository
     private lateinit var dataSource: LocalDataSource
-    private lateinit var restaurants: List<Restaurant>
-    private val gson = GsonBuilder().create()
 
-    private fun initRestaurantList() {
-        val restaurantListType = object : TypeToken<ArrayList<Restaurant>>() {}.type
-        restaurants = gson.fromJson(RESPONSE_MOCK, restaurantListType)
-        //making two restaurants favorite by default
-        restaurants[4].isFavorite = true // sample for opened restaurant
-        restaurants[8].isFavorite = true // sample for order ahead restaurant
-        restaurants[1].isFavorite = true // sample for closed restaurant
-
-
-    }
 
     @Before
     fun init() {

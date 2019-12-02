@@ -1,6 +1,9 @@
 package com.takeaway.kiantestwork
 
 
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+import com.takeaway.kiantestwork.data.dto.Restaurant
 import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.disposables.Disposable
@@ -37,5 +40,19 @@ open class BaseTest {
             RxAndroidPlugins.setInitMainThreadSchedulerHandler { scheduler -> immediate }
 
         }
+    }
+
+    protected lateinit var restaurants: List<Restaurant>
+    private val gson = GsonBuilder().create()
+
+    protected fun initRestaurantList() {
+        val restaurantListType = object : TypeToken<ArrayList<Restaurant>>() {}.type
+        restaurants = gson.fromJson(RESPONSE_MOCK, restaurantListType)
+        //making two restaurants favorite by default
+        restaurants[4].isFavorite = true // sample for opened restaurant
+        restaurants[8].isFavorite = true // sample for order ahead restaurant
+        restaurants[1].isFavorite = true // sample for closed restaurant
+
+
     }
 }
