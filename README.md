@@ -33,12 +33,7 @@ There are some comments in the code that explains my reasoning.
 Tred to make the unit tests as generic as possible so that changes in the sample data has the least effects on test
 
 ## Wishlist
-- Adding a gridlayout for tablets in order to make the view optimised for tablets
-I've tried to make a clean and simple user interface for mobile devices.
-
-However, I've make all @diements ready to rewrite for other screensizes.
-
-my focus on this solution was narrowed down into problem-solving.
+- Adding a gridlayout for tablets in order to make the view optimised for bigger screen sizes! I've tried to make a clean and simple user interface for mobile devices. However, I've make all `res/diemens` ready to rewrite for other screensizes to make it ready for implement.
 
 
 
