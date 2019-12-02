@@ -5,9 +5,7 @@ package com.takeaway.kiantestwork
 const val DATABASE_NAME = "takeaway_db"
 
 
-
-
-val RESPONSE_MOCK = """
+const val RESPONSE_MOCK = """
         [{
             "name": "Tanoshii Sushi",
             "status": "open",
@@ -257,4 +255,4 @@ val RESPONSE_MOCK = """
             }
         }]
     
-    """.trimIndent()
+    """
